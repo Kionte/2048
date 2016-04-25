@@ -14,7 +14,9 @@
 using namespace std;
 
 int** gameBoard(int,int); // initilizes  the gameboard
+int** tempGameBoard(int**,int,int); // copy over gameboard to copy
 char command(char); // input function to control movements
+bool checkMove(int**,int**,int,int); // checks if move is valid
 int leftTranslate(int** arr,int rSize,int cSize); // left movement
 int upTranslate(int** arr,int rSize,int cSize); // up movement
 int rightTranslate(int** arr,int rSize,int cSize); // right movement
@@ -28,57 +30,67 @@ int main() {
     char move = ' '; // var for movemet
     int rSize = 0; // var for row size
     int cSize = 0; // var for column size
+    
     cout << "How many rows? ";
     cin >> rSize; // row input
     cout << "How many columns? ";
     cin >> cSize; // col input
-
+    
     int** arr = gameBoard(rSize,cSize); // sets the 2d array to the gameboard function
-        while(move != 'q') { // while user doesnt quit
+    randomInput(arr, rSize, cSize); // gets and sets initial number
+    update(arr, rSize, cSize); // output initial board
+    int** tempArr = tempGameBoard(arr, rSize, cSize); // sets up copy of board for later comparison
+    while(move != 'q') { // while user doesnt quit
         switch (command(move)) { // runs the command function and detemrines a case based off return value
-        case 'a':
-            **arr = leftTranslate(arr,rSize,cSize);
-            if(gameOverCheck(arr, rSize, cSize)) {
-                randomInput(arr, rSize, cSize);
-                update(arr, rSize, cSize);
-            }
-            else {
-                return 0;
-            }
-            break;
-        case 'w':
-            **arr = upTranslate(arr, rSize, cSize);
-            if(gameOverCheck(arr, rSize, cSize)) {
-                **arr = randomInput(arr, cSize, rSize);
-            update(arr,rSize, cSize);
-            }
-            else {
-                return 0;
-            }
-            break;
-        case 'd':
-            **arr = rightTranslate(arr, rSize, cSize);
-            if(gameOverCheck(arr, rSize, cSize)) {
-            **arr = randomInput(arr, cSize, rSize);
-            update(arr, rSize, cSize);
-            }
-            else {
-                return 0;
-            }
-            break;
-        case 's':
-            **arr = downTranslate(arr, rSize,cSize);
-            if(gameOverCheck(arr, rSize, cSize)) {
-            **arr = randomInput(arr, cSize, rSize);
-            update(arr, rSize, cSize);
-            }
-            else {
-                return 0;
-            }
-            break;
-        default:
-            cout << "incorrect input" << endl;
-            break;
+            case 'a':
+                tempArr = tempGameBoard(arr, rSize, cSize); // copys board for later comparison
+                **arr = leftTranslate(arr,rSize,cSize); // attempts to make move to left
+                if(checkMove(arr, tempArr, rSize, cSize)) { // checks if move is valid if it is contine if not try a different move
+                    if(gameOverCheck(arr, rSize, cSize)) { // checks if there are anymore possible moves
+                        randomInput(arr, rSize, cSize); // if all above is true the input another 2 in a random location
+                        update(arr, rSize, cSize); // output new board
+                    }
+                    else {
+                        return 0; // if no moves end prgram
+                    }
+                }
+                else{
+                    cout << "Invalid move. Try again: " << endl; // if invlaid move tell user to try again
+                }
+                break;
+            case 'w':
+                **arr = upTranslate(arr, rSize, cSize);
+                if(gameOverCheck(arr, rSize, cSize)) {
+                    **arr = randomInput(arr, cSize, rSize);
+                    update(arr,rSize, cSize);
+                }
+                else {
+                    return 0;
+                }
+                break;
+            case 'd':
+                **arr = rightTranslate(arr, rSize, cSize);
+                if(gameOverCheck(arr, rSize, cSize)) {
+                    **arr = randomInput(arr, cSize, rSize);
+                    update(arr, rSize, cSize);
+                }
+                else {
+                    return 0;
+                }
+                break;
+            case 's':
+                **arr = downTranslate(arr, rSize,cSize);
+                if(gameOverCheck(arr, rSize, cSize)) {
+                    **arr = randomInput(arr, cSize, rSize);
+                    update(arr, rSize, cSize);
+                }
+                else {
+                    return 0;
+                }
+                break;
+            default:
+                cout << "incorrect input" << endl;
+                break;
         }
     }
     return 0;
@@ -92,17 +104,37 @@ int** gameBoard(int rSize, int cSize) {
         myGameBoard[r] = new int[cSize];
         for(int c = 0; c < cSize; c++) {
             myGameBoard[r][c] = 0;
-            cout << myGameBoard[r][c] << " ";
         }
-        cout << endl;
     }
     return myGameBoard; // return the newly initilized 2d array
 }
+int** tempGameBoard(int** arr, int rSize, int cSize) {
+    int** myTempArr = new int*[rSize];
+    
+    for(int r = 0; r < rSize; r++) {
+        myTempArr[r] = new int[cSize];
+        for(int c = 0; c < cSize; c++) {
+            myTempArr[r][c] = arr[r][c];
+        }
+    }
+    return myTempArr;
+}
+
 
 char command(char move) { // input move and return move
     cout << "make a move: ";
     cin >> move;
     return move;
+}
+bool checkMove(int** arr,int** tempArr,int rSize,int cSize) {
+    for(int r =0; r < rSize; r++) {
+        for(int c = 0; c < cSize; c++) {
+            if(arr[r][c] != tempArr[r][c]) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 int leftTranslate(int** arr, int rSize, int cSize) {
@@ -115,7 +147,7 @@ int leftTranslate(int** arr, int rSize, int cSize) {
             if(arr[r][c] == 0) { // if current location is empty
                 n = 1;
                 while(arr[r][c] == 0 && n < (cSize - c)) { // while current location is empty and n is in range of table
-                  
+                    
                     if(arr[r][c+n] != 0) { // if next location has value put that value in current location
                         arr[r][c] = arr[r][c+n];
                         arr[r][c+n] = 0;
