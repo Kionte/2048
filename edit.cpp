@@ -8,7 +8,10 @@
 
 // viv
 // sap
-
+//need better gameOverCheck function
+//still need check for zero's funtion
+//need up and down translations
+//
 #include<iostream>
 #include <ctime>
 using namespace std;
@@ -38,17 +41,19 @@ int main() {
     
     int** arr = gameBoard(rSize,cSize); // sets the 2d array to the gameboard function
     randomInput(arr, rSize, cSize); // gets and sets initial number
-    update(arr, rSize, cSize); // output initial board
     int** tempArr = tempGameBoard(arr, rSize, cSize); // sets up copy of board for later comparison
     while(move != 'q') { // while user doesnt quit
+        update(arr, rSize, cSize);
+        tempArr = tempGameBoard(arr, rSize, cSize); // copys board for later comparison
+        //maybe put game over check here and fix the function so that it checks all possible moves instead of just zeroes?
+        
         switch (command(move)) { // runs the command function and detemrines a case based off return value
+                
             case 'a':
-                tempArr = tempGameBoard(arr, rSize, cSize); // copys board for later comparison
                 **arr = leftTranslate(arr,rSize,cSize); // attempts to make move to left
                 if(checkMove(arr, tempArr, rSize, cSize)) { // checks if move is valid if it is contine if not try a different move
-                    if(gameOverCheck(arr, rSize, cSize)) { // checks if there are anymore possible moves
+                    if(gameOverCheck(arr, rSize, cSize)) { // need to fix
                         randomInput(arr, rSize, cSize); // if all above is true the input another 2 in a random location
-                        update(arr, rSize, cSize); // output new board
                     }
                     else {
                         return 0; // if no moves end prgram
@@ -58,34 +63,49 @@ int main() {
                     cout << "Invalid move. Try again: " << endl; // if invlaid move tell user to try again
                 }
                 break;
+                
             case 'w':
-                **arr = upTranslate(arr, rSize, cSize);
-                if(gameOverCheck(arr, rSize, cSize)) {
-                    **arr = randomInput(arr, cSize, rSize);
-                    update(arr,rSize, cSize);
+                **arr = upTranslate(arr,rSize,cSize); // attempts to make move to left
+                if(checkMove(arr, tempArr, rSize, cSize)) { // checks if move is valid if it is contine if not try a different move
+                    if(gameOverCheck(arr, rSize, cSize)) { // need to fix
+                        randomInput(arr, rSize, cSize); // if all above is true the input another 2 in a random location
+                    }
+                    else {
+                        return 0; // if no moves end prgram
+                    }
                 }
-                else {
-                    return 0;
+                else{
+                    cout << "Invalid move. Try again: " << endl; // if invlaid move tell user to try again
                 }
                 break;
+                
             case 'd':
-                **arr = rightTranslate(arr, rSize, cSize);
-                if(gameOverCheck(arr, rSize, cSize)) {
-                    **arr = randomInput(arr, cSize, rSize);
-                    update(arr, rSize, cSize);
+                **arr = rightTranslate(arr,rSize,cSize); // attempts to make move to left
+                if(checkMove(arr, tempArr, rSize, cSize)) { // checks if move is valid if it is contine if not try a different move
+                    if(gameOverCheck(arr, rSize, cSize)) { // need to fix
+                        randomInput(arr, rSize, cSize); // if all above is true the input another 2 in a random location
+                    }
+                    else {
+                        return 0; // if no moves end prgram
+                    }
                 }
-                else {
-                    return 0;
+                else{
+                    cout << "Invalid move. Try again: " << endl; // if invlaid move tell user to try again
                 }
                 break;
+                
             case 's':
-                **arr = downTranslate(arr, rSize,cSize);
-                if(gameOverCheck(arr, rSize, cSize)) {
-                    **arr = randomInput(arr, cSize, rSize);
-                    update(arr, rSize, cSize);
+                **arr = downTranslate(arr,rSize,cSize); // attempts to make move to left
+                if(checkMove(arr, tempArr, rSize, cSize)) { // checks if move is valid if it is contine if not try a different move
+                    if(gameOverCheck(arr, rSize, cSize)) { // need to fix
+                        randomInput(arr, rSize, cSize); // if all above is true the input another 2 in a random location
+                    }
+                    else {
+                        return 0; // if no moves end prgram
+                    }
                 }
-                else {
-                    return 0;
+                else{
+                    cout << "Invalid move. Try again: " << endl; // if invlaid move tell user to try again
                 }
                 break;
             default:
@@ -126,16 +146,7 @@ char command(char move) { // input move and return move
     cin >> move;
     return move;
 }
-bool checkMove(int** arr,int** tempArr,int rSize,int cSize) {
-    for(int r =0; r < rSize; r++) {
-        for(int c = 0; c < cSize; c++) {
-            if(arr[r][c] != tempArr[r][c]) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
+
 
 int leftTranslate(int** arr, int rSize, int cSize) {
     int n;
@@ -177,14 +188,68 @@ int leftTranslate(int** arr, int rSize, int cSize) {
     }
     return **arr; // return the array after left translation
 }
+
 int upTranslate(int** arr, int rSize, int cSize) {
+    
     return **arr;
 }
+
 int rightTranslate(int** arr, int rSize, int cSize) {
+    int n;
+    bool quitLoop;
+    int g = -1;
+    
+    for(int r = 0; r < rSize; r++) {
+        g = -1;
+        for(int c = cSize-1; c > 0; c--) { // checker to go through the entire array
+            n = 1;
+            g++;
+            if(arr[r][c] == 0) { // if current location is empty
+                n = 1;
+                while(arr[r][c] == 0 && n < (cSize - g)) { // while current location is empty and n is in range of table
+
+                    if(arr[r][c-n] != 0) { // if next location has value put that value in current location
+                        arr[r][c] = arr[r][c-n];
+                        arr[r][c-n] = 0;
+                    }
+                    else { //increment n to check next column
+                        n++;
+                    }
+                }
+            }
+            n = 1;
+            quitLoop = false;
+            
+            while(!quitLoop && n < (cSize - g)) { // loop checks if the locations will have same value when moved
+                if(arr[r][c-n] == arr[r][c]) {
+                    arr[r][c] += arr[r][c-n];
+                    arr[r][c-n] = 0;
+                    quitLoop = true;
+                }
+                else if(arr[r][c-n] == 0) { // check next col
+                    n++;
+                }
+                else {
+                    quitLoop = true; // nothing left to check end loop
+                }
+            }
+        }
+    }
     return **arr;
 }
+
 int downTranslate(int** arr, int rSize, int cSize) {
     return **arr;
+}
+bool checkMove(int** arr,int** tempArr,int rSize,int cSize) {
+    for(int r =0; r < rSize; r++) { // checker to see see if there is a difference between board before and after move
+        for(int c = 0; c < cSize; c++) {
+            if(arr[r][c] != tempArr[r][c]) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 bool gameOverCheck(int** arr, int rSize, int cSize) {
     for(int r = 0; r < rSize; r++) { // goes through 2d array to see if any moves are possible
