@@ -4,7 +4,7 @@
 //
 //  Created by Kionte Brown on 4/22/16.
 //  Edited by Vicky Sorokina on 4/26/16
-//  Copyright © 2016 Kionte Brown. All rights reserved.
+//  Copyright Â© 2016 Kionte Brown. All rights reserved.
 //
 
 // viv
@@ -15,13 +15,12 @@
 //
 
 //to do:
-//up down -vicky
+//up down -vicky DONE
 //score count -vicky
 //gameover function -kiotne
-//clear cin buffer -kionte
+//clear cin buffer -vicky DONE
 //make whole thing into class (later)
 //callin functions (later)
-//check for 0's function - vicky 
 //save input output (later)- joel
 //some way to keep board square (class?) (later)
 //commands without using enter (later)
@@ -58,7 +57,7 @@ int main() {
 	while (move != 'q') { // while user doesnt quit
 		update(arr, Size);
 		tempArr = tempGameBoard(arr, Size); // copys board for later comparison
-											//maybe put game over check here and fix the function so that it checks all possible moves instead of just zeroes?
+		//maybe put game over check here and fix the function so that it checks all possible moves instead of just zeroes?
 
 		switch (command(move)) { // runs the command function and detemrines a case based off return value
 
@@ -118,14 +117,19 @@ int main() {
 					return 0; // if no moves end prgram
 				}
 			}
+
 			else {
 				cout << "Invalid move. Try again: " << endl; // if invlaid move tell user to try again
 			}
 			break;
+
+		case 'q':
+			return 0;
 		default:
 			cout << "incorrect input" << endl;
 			break;
 		}
+		system("cls");
 	}
 	return 0;
 }
@@ -162,13 +166,13 @@ char command(char move) { // input move and return move
 }
 
 
+
 int leftTranslate(int** arr, int Size) {
 	int n;
 	bool quitLoop;
 
 	for (int r = 0; r < Size; r++) {
 		for (int c = 0; c < Size; c++) { // checker to go through the entire array
-			n = 1;
 			if (arr[r][c] == 0) { // if current location is empty
 				n = 1;
 				while (arr[r][c] == 0 && n < (Size - c)) { // while current location is empty and n is in range of table
@@ -205,7 +209,43 @@ int leftTranslate(int** arr, int Size) {
 
 int upTranslate(int** arr, int Size) {
 
-	return **arr;
+	int n;
+	bool quitLoop;
+
+	for (int c = 0; c < Size; c++) {
+		for (int r = 0; r < Size; r++) { // checker to go through the entire array
+			if (arr[r][c] == 0) { // if current location is empty
+				n = 1;
+				while (arr[r][c] == 0 && n < (Size - r)) { // while current location is empty and n is in range of table
+
+					if (arr[r + n][c] != 0) { // if next location has value put that value in current location
+						arr[r][c] = arr[r + n][c];
+						arr[r + n][c] = 0;
+					}
+					else { //increment n to check next column
+						n++;
+					}
+				}
+			}
+			n = 1;
+			quitLoop = false;
+
+			while (!quitLoop && n < (Size - r)) { // loop checks if the locations will have same value when moved
+				if (arr[r + n][c] == arr[r][c]) {
+					arr[r][c] += arr[r + n][c];
+					arr[r + n][c] = 0;
+					quitLoop = true;
+				}
+				else if (arr[r + n][c] == 0) { // check next col
+					n++;
+				}
+				else {
+					quitLoop = true; // nothing left to check end loop
+				}
+			}
+		}
+	}
+	return **arr; // return the array after left translation
 }
 
 int rightTranslate(int** arr, int Size) {
@@ -253,6 +293,45 @@ int rightTranslate(int** arr, int Size) {
 }
 
 int downTranslate(int** arr, int Size) {
+	int n;
+	bool quitLoop;
+	int g = -1;
+
+	for (int c = 0; c < Size; c++) {
+		g = -1;
+		for (int r = Size - 1; r > 0; r--) { // checker to go through the entire array
+			n = 1;
+			g++;
+			if (arr[r][c] == 0) { // if current location is empty
+				while (arr[r][c] == 0 && n < (Size - g)) { // while current location is empty and n is in range of table
+
+					if (arr[r - n][c] != 0) { // if next location has value put that value in current location
+						arr[r][c] = arr[r - n][c];
+						arr[r - n][c] = 0;
+					}
+					else { //increment n to check next column
+						n++;
+					}
+				}
+			}
+			n = 1;
+			quitLoop = false;
+
+			while (!quitLoop && n < (Size - g)) { // loop checks if the locations will have same value when moved
+				if (arr[r - n][c] == arr[r][c]) {
+					arr[r][c] += arr[r - n][c];
+					arr[r - n][c] = 0;
+					quitLoop = true;
+				}
+				else if (arr[r - n][c] == 0) { // check next col
+					n++;
+				}
+				else {
+					quitLoop = true; // nothing left to check end loop
+				}
+			}
+		}
+	}
 	return **arr;
 }
 bool checkMove(int** arr, int** tempArr, int Size) {
