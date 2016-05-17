@@ -80,9 +80,9 @@ string Tile::makeData()//creates the apropriate string based on the number of di
 			temp += "]";
 			break;
 		case 5:
-			temp = "]";
+			temp = "[";
 			temp += to_string(value);
-			temp += "[";
+			temp += "]";
 			break;
 		default:
 			temp = "[ERROR]";
