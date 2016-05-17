@@ -26,15 +26,19 @@ public:
 	//int setCommand(int newCommand); // main
 	void changeGB(); // switch statement call one o next 4 functions
 
+	bool save() const;
+
 	bool checkMove();
 	bool gameOverCheck();
 
 	GB(); // intit gameboard
-	GB(int** savedBoard, int savedScore, int size); // load game
-													// ~GB();
+	~GB();
 
 	void initGB();
 	void initTempGB();
+	void initGB(string data);//overload for loading a save file
+	void initTempGB(string data);//overload for loading a save file
+	int loadScore(string data);//loads the score from the file data
 	void updateTempGB();
 	void outputGB();
 

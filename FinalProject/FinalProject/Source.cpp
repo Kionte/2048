@@ -9,14 +9,10 @@
 #include <iostream>
 #include <string>
 #include "GB.h"
+#include <fstream>
 
 
 void playGame() {
-	//int move;
-	/*cout << "Do you want to load your save? (y/n)";
-	char choice;
-	cin >> choice;
-	if (choice.toupper())*/
 
 	GB game;
 

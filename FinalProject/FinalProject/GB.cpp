@@ -10,6 +10,11 @@
 #include <conio.h>
 #include "GB.h"
 #include "Tile.h"
+#include <stdio.h>
+#include <stdlib.h> 
+#include <fstream>
+#include <string>
+using namespace std;
 
 
 void GB::initGB() {
@@ -31,16 +36,224 @@ void GB::initTempGB() {
 	}
 }
 
-GB::GB() {
-	size = 4;
-	score = 0;
-	initGB();
-	randomInput();
-	randomInput();
-	initTempGB();
-	outputGB(); // should be in design  class?
-
+void GB::initGB(string data)
+{
+	GBValues = new Tile*[size];
+	for (int r = 0; r < size; r++) {
+		GBValues[r] = new Tile[size];
+		for (int c = 0; c < size; c++) {
+			//gets the correct letter from the save data
+			char temp = data.at(1 + ((r*size) + c));
+			switch (temp)
+			{
+			case 'a':
+				GBValues[r][c].changeValue(0);
+				break;
+			case 'b':
+				GBValues[r][c].changeValue(2);
+				break;
+			case 'c':
+				GBValues[r][c].changeValue(4);
+				break;
+			case 'd':
+				GBValues[r][c].changeValue(8);
+				break;
+			case 'e':
+				GBValues[r][c].changeValue(16);
+				break;
+			case 'f':
+				GBValues[r][c].changeValue(32);
+				break;
+			case 'g':
+				GBValues[r][c].changeValue(64);
+				break;
+			case 'h':
+				GBValues[r][c].changeValue(128);
+				break;
+			case 'i':
+				GBValues[r][c].changeValue(256);
+				break;
+			case 'j':
+				GBValues[r][c].changeValue(512);
+				break;
+			case 'k':
+				GBValues[r][c].changeValue(1024);
+				break;
+			case 'l':
+				GBValues[r][c].changeValue(2048);
+				break;
+			case 'm':
+				GBValues[r][c].changeValue(4096);
+				break;
+			case 'n':
+				GBValues[r][c].changeValue(8192);
+				break;
+			case 'o':
+				GBValues[r][c].changeValue(16384);
+				break;
+			case 'p':
+				GBValues[r][c].changeValue(32768);
+				break;
+			case 'q':
+				GBValues[r][c].changeValue(65536);
+				break;
+			default:
+				GBValues[r][c].changeValue(0);
+				break;
+			}
+		}
+	}
 }
+
+
+void GB::initTempGB(string data)
+{
+	tempGBValues = new int*[size];
+	for (int r = 0; r < size; r++) {
+		tempGBValues[r] = new int[size];
+		for (int c = 0; c < size; c++) {
+			//gets the correct letter from the save data
+			char temp = data.at(1 + ((r*size) + c));
+			switch (temp)
+			{
+			case 'a':
+				tempGBValues[r][c] = 0;
+				break;
+			case 'b':
+				tempGBValues[r][c] = 2;
+				break;
+			case 'c':
+				tempGBValues[r][c] = 4;
+				break;
+			case 'd':
+				tempGBValues[r][c] = 8;
+				break;
+			case 'e':
+				tempGBValues[r][c] = 16;
+				break;
+			case 'f':
+				tempGBValues[r][c] = 32;
+				break;
+			case 'g':
+				tempGBValues[r][c] = 64;
+				break;
+			case 'h':
+				tempGBValues[r][c] = 124;
+				break;
+			case 'i':
+				tempGBValues[r][c] = 256;
+				break;
+			case 'j':
+				tempGBValues[r][c] = 512;
+				break;
+			case 'k':
+				tempGBValues[r][c] = 1024;
+				break;
+			case 'l':
+				tempGBValues[r][c] = 2048;
+				break;
+			case 'm':
+				tempGBValues[r][c] = 4096;
+				break;
+			case 'n':
+				tempGBValues[r][c] = 8192;
+				break;
+			case 'o':
+				tempGBValues[r][c] = 16384;
+				break;
+			case 'p':
+				tempGBValues[r][c] = 32768;
+				break;
+			case 'q':
+				tempGBValues[r][c] = 65536;
+				break;
+			default:
+				tempGBValues[r][c] = 0;
+				break;
+			}
+		}
+	}
+}
+
+int GB::loadScore(string data)//gets the score from the save data
+{
+	string scoreStr;
+	int scorelength = (data.size()-((size*size)+1));
+	for (int i = 0;i < scorelength;i++)
+	{
+		scoreStr += data.at(((size*size) + 1) + i);
+	}
+
+	int score = atoi(scoreStr.c_str());
+	return score;
+}
+
+
+GB::GB()
+{
+	ifstream save;
+	save.open("save.txt");
+	if (save.fail())
+	{
+		cout << "Enter the size: ";
+		cin >> size;
+		score = 0;
+		initGB();
+		randomInput();
+		randomInput();
+		initTempGB();
+	}
+	else
+	{
+		cout << "Do you want to load your save? (y/n)\n" ;
+		char choice;
+		cin >> choice;
+		if (toupper(choice) == 'Y')
+		{
+			//gets the data from the file
+			string data;
+			getline(save, data);
+			save.close();
+
+			//starts constructing the board from the data in the file
+			
+			size = data.at(0)-'0';
+			initGB(data);
+			initTempGB(data);
+			score = loadScore(data);
+		}
+		else
+		{
+			cout << "Enter the size: ";
+			cin >> size;
+			score = 0;
+			initGB();
+			randomInput();
+			randomInput();
+			initTempGB();
+		}
+
+	}
+	outputGB();
+}
+
+
+
+GB::~GB()//Destroys the game;
+{
+	for (int i = 0;i < size;i++)
+	{
+		delete[] GBValues[i];
+	}
+	delete[]GBValues;
+
+	for (int i = 0;i < size;i++)
+	{
+		delete[] tempGBValues[i];
+	}
+	delete[]tempGBValues;
+}
+
 
 int GB::getScore() const { // gets score
 	return score;
@@ -312,19 +525,30 @@ void GB::outputGB() {
 	system("cls");
 	cout << "          Score: " << score << endl;
 	for (int r = 0; r < size; r++) { // output new array
-		std::cout << "----------------------------" << std::endl; //the following code works... 
+		
+				 //the following code works... 
+
+		for (int i = 0;i < size;i++)
+		{
+			cout << "-------";
+		}
+		cout << endl; 
 		for (int c = 0; c < size; c++) {
-				std::cout << GBValues[r][c].getData();
+				cout << GBValues[r][c].getData();
 		}
 
-		std::cout << std::endl;
+		cout << endl;
 	}
-	std::cout << "----------------------------" << std::endl;
+	for (int i = 0;i < size;i++)
+	{
+		cout << "-------";
+	}
+	cout << endl;
 }
 
 
 
-void GB::changeGB() {
+void GB::changeGB() {//takes an input and performs the apropriate action
 	switch (command()) {
 	case 75:
 		leftGB();
@@ -354,10 +578,100 @@ void GB::changeGB() {
 		}
 		outputGB();
 		break;
+	case 's':
+		save();
+		break;
 	default:
-		//non valid move
+		//non valid moves
 		break;
 	}
+}
+
+bool GB::save() const//this will save the current board configuration and score to a file
+{
+	remove("save.txt");//deletes the previous save file
+	ofstream save;//opens the file
+	save.open("save.txt");//checks if the file opened
+	if (save.fail())
+	{
+		cout << "Save failed!";
+		return true;
+	
+	}
+
+	//this will actually save the data
+
+	save << size;
+
+	for (int i = 0; i < size;i++)
+	{
+		for (int j = 0; j < size;j++)
+		{
+			switch (GBValues[i][j].getValue())//saves a letter for each possible value with 5 or less digits
+			{
+			case 0:
+				save << 'a';
+				break;
+			case 2:
+				save << 'b';
+				break;
+			case 4:
+				save << 'c';
+				break;
+			case 8:
+				save << 'd';
+				break;
+			case 16:
+				save << 'e';
+				break;
+			case 32:
+				save << 'f';
+				break;
+			case 64:
+				save << 'g';
+				break;
+			case 128:
+				save << 'h';
+				break;
+			case 256:
+				save << 'i';
+				break;
+			case 512:
+				save << 'j';
+				break;
+			case 1024:
+				save << 'k';
+				break;
+			case 2048:
+				save << 'l';
+				break;
+			case 4096:
+				save << 'm';
+				break;
+			case 8192:
+				save << 'n';
+				break;
+			case 16384:
+				save << 'o';
+				break;
+			case 32768:
+				save << 'p';
+				break;
+			case 65536:
+				save << 'q';
+				break;
+			default:
+				save << 'a';
+				break;
+
+			}
+		}
+	}
+	save << score;
+	cout << "Saved!";
+	save.close();
+	return false;
+
 }
 
 

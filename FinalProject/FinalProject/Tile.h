@@ -19,7 +19,7 @@ private:
 	string data;
 public:
 	Tile();//defualt constrcuctor
-	Tile(int num);//creates a tile witht he sepcified value or 0 for blank
+	Tile(int num);//creates a tile with the sepcified value or 0 for blank
 	int getValue() const;//returns tyhe value
 	string getData() const;//will store a string that represents the tile with correct formatting
 	void changeValue(int num);//will change the value of the tile
